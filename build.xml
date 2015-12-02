@@ -27,7 +27,7 @@
                    source="1.6"
                    target="1.6"
                    debug="true"
-                   debuglevel="lines,source">
+                   debuglevel="lines,vars,source">
                 <classpath refid="@{classpathref}"/>
             </javac>
 

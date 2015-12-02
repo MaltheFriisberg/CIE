@@ -4,7 +4,9 @@ import static com.google.common.collect.Iterables.find;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.netmelody.cieye.core.domain.Feature;
 import org.netmelody.cieye.core.observation.Contact;
@@ -49,15 +51,67 @@ public final class TeamCityCommunicator {
     }
 
     public Collection<Project> projects() {
+        try {
         return makeTeamCityRestCall(endpoint + prefix + "/projects", TeamCityProjects.class).project();
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return null;
     }
 
     public Collection<BuildType> buildTypes() {
-        return makeTeamCityRestCall(endpoint + prefix + "/buildTypes", BuildTypes.class).buildType();
+        try {
+            Collection<BuildType> theList = makeTeamCityRestCall(endpoint + prefix + "/buildTypes", BuildTypes.class).buildType();
+            Collection<BuildType> theList1 =  new ArrayList<BuildType>();
+            
+            
+            for(BuildType Bt : theList) {
+                Collection<Build> builds = buildsPerBuildType((Bt));
+                for(Build build : builds) {
+                    BuildType toAdd = new BuildType();
+                    toAdd.name = Bt.name +" "+build.branchName;
+                    toAdd.href = Bt.href;
+                    toAdd.projectName = Bt.projectName;
+                    toAdd.projectId = Bt.projectId;
+                    toAdd.id = Bt.id;
+                    
+                    
+                    boolean contains = theList1.contains(toAdd);
+                    
+                    theList1.add(toAdd);
+                    
+                }
+            }
+        return theList1;
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public Collection<Build> buildsPerBuildType(BuildType bt) {
+        try {
+        //http://dinerotest3.cloudapp.net:3500/app/rest/builds/?locator=running:any,buildType:id:Dinero_Feature,branch:any:default
+        Collection<Build> builds = makeTeamCityRestCall(endpoint + prefix +"/builds/?locator=running:any,buildType:id:"+bt.id+",branch:any:default", Builds.class).build();
+        Collection<Build> buildsToReturn = new ArrayList<Build>();
+        Set<Build> set = new HashSet<Build>();
+        set.addAll(builds);
+        buildsToReturn.addAll(set);
+        
+        return buildsToReturn;
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public Collection<BuildType> buildTypesFor(Project projectDigest) {
-        return makeTeamCityRestCall(endpoint + projectDigest.href, ProjectDetail.class).buildTypes.buildType();
+        try {
+        Collection<BuildType> buildTypes = makeTeamCityRestCall(endpoint + projectDigest.href, ProjectDetail.class).buildTypes.buildType();
+        return buildTypes;
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return null;
     }
 
     public BuildTypeDetail detailsFor(BuildType buildType) {
@@ -65,30 +119,58 @@ public final class TeamCityCommunicator {
     }
 
     public Build lastCompletedBuildFor(BuildTypeDetail buildTypeDetail) {
+        try {
         final Builds completedBuilds = makeTeamCityRestCall(endpoint + buildTypeDetail.builds.href, Builds.class);
         if (null == completedBuilds.build() || completedBuilds.build().isEmpty()) {
             return null;
         }
         return find(completedBuilds.build(), primaryBranchBuilds);
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return null;
     }
 
     public List<Build> runningBuildsFor(BuildType buildType) {
-        return makeTeamCityRestCall(endpoint + prefix + "/builds/?locator=running:true,buildType:id:" + buildType.id, Builds.class).build();
+        try {
+            return makeTeamCityRestCall(endpoint + prefix + "/builds/?locator=running:true,buildType:id:" + buildType.id, Builds.class).build();
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return null;
+        
     }
 
     public List<Investigation> investigationsOf(BuildType buildType) {
-        return makeTeamCityRestCall(endpoint + buildType.href + "/investigations", Investigations.class).investigation();
+        try {
+            return makeTeamCityRestCall(endpoint + buildType.href + "/investigations", Investigations.class).investigation();
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return null;
+        
     }
 
     public BuildDetail detailsOf(Build build) {
-        return makeTeamCityRestCall(endpoint + build.href, BuildDetail.class);
+        try {
+            return makeTeamCityRestCall(endpoint + build.href, BuildDetail.class);   
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return null;
     }
 
     public void commentOn(Build lastCompletedBuild, String note) {
-        contact.doPut(endpoint + lastCompletedBuild.href + "/comment", note);
+        try {
+            contact.doPut(endpoint + lastCompletedBuild.href + "/comment", note);
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        
     }
 
     public List<Change> changesOf(BuildDetail buildDetail) {
+        try {
         final JsonElement json = contact.makeJsonRestCall(endpoint + buildDetail.changes.href);
         final JsonElement change = json.isJsonObject() ? json.getAsJsonObject().get("change") : JsonNull.INSTANCE;
         
@@ -104,19 +186,42 @@ public final class TeamCityCommunicator {
         }
         
         return changes;
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return null;
     }
 
     public ChangeDetail detailedChangesOf(Change change) {
+        try {
         return makeTeamCityRestCall(endpoint + change.href, ChangeDetail.class);
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return null;
     }
 
     private <T> T makeTeamCityRestCall(String url, Class<T> type) {
-        return contact.makeJsonRestCall(url, type);
+        try {
+            return contact.makeJsonRestCall(url, type);
+        } catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return null;
+        
     }
 
     private static final Predicate<Build> primaryBranchBuilds = new Predicate<Build>() {
         @Override public boolean apply(Build input) {
-            return input.defaultBranch == null || input.defaultBranch;
+        try {
+            
+                return input.defaultBranch == null || input.defaultBranch;
+                
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
         }
+            return false;
+        }
+        
     };
 }

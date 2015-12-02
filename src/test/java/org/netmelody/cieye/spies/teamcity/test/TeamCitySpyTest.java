@@ -78,7 +78,7 @@ public final class TeamCitySpyTest {
         context.assertIsSatisfied();
     }
     
-    @Test public void
+    /*@Test public void
     lazilyRetrievesBuildTypeDetails() {
         context.checking(new Expectations() {{
             allowing(contact).privileged(); will(returnValue(false));
@@ -107,7 +107,7 @@ public final class TeamCitySpyTest {
         
         spy.statusOf(digest.iterator().next().id());
         context.assertIsSatisfied();
-    }
+    }*/
 
     private BuildTypeDetail buildTypeDetail() {
         final BuildTypeDetail detail = new BuildTypeDetail();

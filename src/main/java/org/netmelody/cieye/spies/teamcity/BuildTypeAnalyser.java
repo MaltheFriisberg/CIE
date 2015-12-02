@@ -31,6 +31,11 @@ public final class BuildTypeAnalyser {
     }
     
     public TargetDetail targetFrom(BuildType buildType) {
+        try {
+            
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
         final BuildTypeDetail buildTypeDetail = communicator.detailsFor(buildType);
         
         if (buildTypeDetail.paused) {
@@ -71,25 +76,38 @@ public final class BuildTypeAnalyser {
     }
 
     private Set<Sponsor> sponsorsOf(BuildDetail build) {
-        return detective.search(analyseChanges(build));
+        try {
+            return detective.search(analyseChanges(build));
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return null;
+        
     }
 
     private String analyseChanges(BuildDetail build) {
-        if (build.changes == null || build.changes.count == 0) {
-            return "";
+        try {
+            if (build.changes == null || build.changes.count == 0) {
+                return "";
+            }
+            
+            final List<Change> changes = communicator.changesOf(build);
+            
+            final StringBuilder result = new StringBuilder();
+            for (Change change : changes) {
+                final ChangeDetail changeDetail = communicator.detailedChangesOf(change);
+                result.append(changeDetail.username);
+                result.append(' ');
+                result.append(changeDetail.comment);
+                result.append(' ');
+            }
+            
+            return result.toString();
+            
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
         }
-        
-        final List<Change> changes = communicator.changesOf(build);
-        
-        final StringBuilder result = new StringBuilder();
-        for (Change change : changes) {
-            final ChangeDetail changeDetail = communicator.detailedChangesOf(change);
-            result.append(changeDetail.username);
-            result.append(' ');
-            result.append(changeDetail.comment);
-            result.append(' ');
-        }
-        
-        return result.toString();
+        return null;
+       
     }
 }

@@ -38,6 +38,7 @@ public final class TeamCitySpy implements CiSpy {
 
     @Override
     public TargetDigestGroup targetsConstituting(Feature feature) {
+        try {
         final Collection<BuildType> buildTypes = buildTypesFor(feature);
         final List<TargetDigest> digests = newArrayList();
         
@@ -48,19 +49,29 @@ public final class TeamCitySpy implements CiSpy {
         }
         
         return new TargetDigestGroup(digests);
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return null;
     }
 
     @Override
     public TargetDetail statusOf(final TargetId target) {
+        try {
         BuildType buildType = recognisedBuildTypes.get(target);
         if (null == buildType) {
             return null;
         }
         return buildTypeAnalyser.targetFrom(buildType);
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return null;
     }
     
     @Override
     public boolean takeNoteOf(TargetId target, String note) {
+        try {
         if (!recognisedBuildTypes.containsKey(target)) {
             return false;
         }
@@ -72,9 +83,14 @@ public final class TeamCitySpy implements CiSpy {
         }
 
         return true;
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return false;
     }
 
     private Collection<BuildType> buildTypesFor(final Feature feature) {
+        try {
         if (!communicator.canSpeakFor(feature)) {
             return newArrayList();
         }
@@ -85,13 +101,22 @@ public final class TeamCitySpy implements CiSpy {
         }
         
         return filter(buildTypes, withFeatureName(feature.name()));
+        } catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return null;
     }
 
     private Predicate<BuildType> withFeatureName(final String featureName) {
+        try {
         return new Predicate<BuildType>() {
             @Override public boolean apply(BuildType buildType) {
                 return buildType.projectName.trim().equals(featureName.trim());
             }
         };
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return null;
     }
 }
