@@ -1,4 +1,3 @@
-#Mon Aug 29 10:06:58 BST 2011
 eclipse.preferences.version=1
 org.eclipse.wst.jsdt.core.compiler.problem.deprecation=warning
 org.eclipse.wst.jsdt.core.compiler.problem.deprecationInDeprecatedCode=disabled
@@ -32,7 +31,7 @@ org.eclipse.wst.jsdt.core.compiler.problem.unresolvedMethodReference=error
 org.eclipse.wst.jsdt.core.compiler.problem.unresolvedTypeReference=error
 org.eclipse.wst.jsdt.core.compiler.problem.unusedDeclaredThrownExceptionWhenOverriding=disabled
 org.eclipse.wst.jsdt.core.compiler.problem.unusedLabel=warning
-org.eclipse.wst.jsdt.core.compiler.problem.unusedLocal=error
+org.eclipse.wst.jsdt.core.compiler.problem.unusedLocal=warning
 org.eclipse.wst.jsdt.core.compiler.problem.unusedParameter=ignore
 org.eclipse.wst.jsdt.core.compiler.problem.unusedParameterIncludeDocCommentReference=enabled
 org.eclipse.wst.jsdt.core.compiler.problem.unusedParameterWhenImplementingAbstract=disabled
