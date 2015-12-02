@@ -69,7 +69,7 @@ public final class TeamCityCommunicator {
                 Collection<Build> builds = buildsPerBuildType((Bt));
                 for(Build build : builds) {
                     BuildType toAdd = new BuildType();
-                    toAdd.name = Bt.name +" "+build.branchName;
+                    toAdd.name = build.buildTypeId +" "+build.branchName;
                     toAdd.href = Bt.href;
                     toAdd.projectName = Bt.projectName;
                     toAdd.projectId = Bt.projectId;
@@ -81,6 +81,9 @@ public final class TeamCityCommunicator {
                     theList1.add(toAdd);
                     
                 }
+            }
+            for(BuildType b: theList1) {
+                System.out.println(b.name);
             }
         return theList1;
         } catch(Exception e) {

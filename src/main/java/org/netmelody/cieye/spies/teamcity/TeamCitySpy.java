@@ -99,7 +99,7 @@ public final class TeamCitySpy implements CiSpy {
         if (feature.name().isEmpty()) {
             return buildTypes;
         }
-        
+        //return buildTypes;
         return filter(buildTypes, withFeatureName(feature.name()));
         } catch(Exception e) {
             e.printStackTrace(System.out);
