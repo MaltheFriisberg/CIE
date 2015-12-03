@@ -5,6 +5,7 @@ import static com.google.common.collect.Iterables.find;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -61,31 +62,32 @@ public final class TeamCityCommunicator {
 
     public Collection<BuildType> buildTypes() {
         try {
-            Collection<BuildType> theList = makeTeamCityRestCall(endpoint + prefix + "/buildTypes", BuildTypes.class).buildType();
-            Collection<BuildType> theList1 =  new ArrayList<BuildType>();
+            
+            Collection<BuildType> theList = FilterArray(makeTeamCityRestCall(endpoint + prefix +
+                    "/buildTypes", BuildTypes.class).buildType());
+            Collection<BuildType> result =  new LinkedList<BuildType>();
             
             
             for(BuildType Bt : theList) {
                 Collection<Build> builds = buildsPerBuildType((Bt));
                 for(Build build : builds) {
                     BuildType toAdd = new BuildType();
-                    toAdd.name = build.buildTypeId +" "+build.branchName;
+                    toAdd.name = FormatName(build.buildTypeId) +" "+build.branchName;
                     toAdd.href = Bt.href;
                     toAdd.projectName = Bt.projectName;
                     toAdd.projectId = Bt.projectId;
                     toAdd.id = Bt.id;
                     
-                    
-                    boolean contains = theList1.contains(toAdd);
-                    
-                    theList1.add(toAdd);
+                    result.add(toAdd);
                     
                 }
             }
-            for(BuildType b: theList1) {
-                System.out.println(b.name);
+            
+            for(BuildType b: result) {
+                
+                //System.out.println(b.name);
             }
-        return theList1;
+        return result;
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -95,7 +97,7 @@ public final class TeamCityCommunicator {
         try {
         //http://dinerotest3.cloudapp.net:3500/app/rest/builds/?locator=running:any,buildType:id:Dinero_Feature,branch:any:default
         Collection<Build> builds = makeTeamCityRestCall(endpoint + prefix +"/builds/?locator=running:any,buildType:id:"+bt.id+",branch:any:default", Builds.class).build();
-        Collection<Build> buildsToReturn = new ArrayList<Build>();
+        Collection<Build> buildsToReturn = new LinkedList<Build>();
         Set<Build> set = new HashSet<Build>();
         set.addAll(builds);
         buildsToReturn.addAll(set);
@@ -213,6 +215,40 @@ public final class TeamCityCommunicator {
         return null;
         
     }
+    private ArrayList<BuildType> FilterArray(List<BuildType> arr) {
+        try {
+        ArrayList<BuildType> toReturn = new ArrayList<BuildType>();
+        for(BuildType bt : arr) {
+            if(bt.id.equals("Dinero_Feature") || bt.id.equals("Dinero_MasterHotfix")) {
+                
+                toReturn.add(bt);
+            }
+            
+        }
+        
+        return toReturn;
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return null;
+    }
+    
+    private String FormatName(String name) {
+        try {
+        
+            int startIndex = name.indexOf("D");
+            int endIndex = name.indexOf("_")+1;
+            String toReplace = name.substring(startIndex, endIndex);
+            
+            String newName = name.replace(toReplace, "");
+            
+            return newName;
+        
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        return "";
+    }
 
     private static final Predicate<Build> primaryBranchBuilds = new Predicate<Build>() {
         @Override public boolean apply(Build input) {
@@ -227,4 +263,5 @@ public final class TeamCityCommunicator {
         }
         
     };
+    
 }

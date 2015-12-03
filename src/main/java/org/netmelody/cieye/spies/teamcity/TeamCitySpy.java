@@ -26,6 +26,7 @@ import com.google.common.base.Predicate;
 
 public final class TeamCitySpy implements CiSpy {
 
+    private static final boolean BuildType = false;
     private final TeamCityCommunicator communicator;
     private final BuildTypeAnalyser buildTypeAnalyser;
 
@@ -43,8 +44,10 @@ public final class TeamCitySpy implements CiSpy {
         final List<TargetDigest> digests = newArrayList();
         
         for (BuildType buildType : buildTypes) {
+            //this doesnt work when we change the buildType.id??
             final TargetDigest targetDigest = new TargetDigest(communicator.endpoint() + buildType.href, buildType.webUrl(), buildType.name, UNKNOWN);
             digests.add(targetDigest);
+            
             recognisedBuildTypes.put(targetDigest.id(), buildType);
         }
         
@@ -99,8 +102,14 @@ public final class TeamCitySpy implements CiSpy {
         if (feature.name().isEmpty()) {
             return buildTypes;
         }
+        Collection<BuildType> whatsInIt= filter(buildTypes, withFeatureName(feature.name()));
         //return buildTypes;
-        return filter(buildTypes, withFeatureName(feature.name()));
+        //Predicate<BuildType> testPred = withFeatureName(buildTypes.get(2));
+        int k = whatsInIt.size();
+        
+        String y = "test";
+        return buildTypes;
+        //return filter(buildTypes, withFeatureName(feature.name()));
         } catch(Exception e) {
             e.printStackTrace(System.out);
         }

@@ -3,6 +3,7 @@ package org.netmelody.cieye.server.response;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.simpleframework.http.Status;
@@ -18,6 +19,7 @@ public final class CiEyeResponse {
     public final long lastModified;
     public final Status status;
     public final ImmutableMap<String, String> additionalStringHeaders;
+    //public final HashMap<String, String> additionalStringHeaders;
 
     private final byte[] content;
 

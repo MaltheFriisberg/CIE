@@ -29,18 +29,25 @@ public final class LandscapeObservationResponder implements CiEyeResponder {
 
     @Override
     public CiEyeResponse respond(Request request) throws IOException {
-        LandscapeObservation result = new LandscapeObservation();
-        long timeToLiveMillis = Long.MAX_VALUE;
-        for (Feature feature : landscape.features()) {
-            final TargetGroupBriefing briefing = spyIntermediary.briefingOn(feature);
-            result = result.add(briefing.status);
-            timeToLiveMillis = min(timeToLiveMillis, briefing.millisecondsUntilNextUpdate);
+        try {
+            LandscapeObservation result = new LandscapeObservation();
+            long timeToLiveMillis = Long.MAX_VALUE;
+            for (Feature feature : landscape.features()) {
+                final TargetGroupBriefing briefing = spyIntermediary.briefingOn(feature);
+                result = result.add(briefing.status);
+                timeToLiveMillis = min(timeToLiveMillis, briefing.millisecondsUntilNextUpdate);
+            }
+            
+            if (prison.crimeReported(landscape)) {
+                result = result.withDoh(prison.prisonersFor(landscape));
+            }
+            
+            return CiEyeResponse.withJson(new JsonTranslator().toJson(result)).expiringInMillis(timeToLiveMillis);
+            
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
         }
+        return null;
         
-        if (prison.crimeReported(landscape)) {
-            result = result.withDoh(prison.prisonersFor(landscape));
-        }
-        
-        return CiEyeResponse.withJson(new JsonTranslator().toJson(result)).expiringInMillis(timeToLiveMillis);
     }
 }

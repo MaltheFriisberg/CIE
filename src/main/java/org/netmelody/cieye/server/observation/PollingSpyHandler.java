@@ -61,18 +61,25 @@ public final class PollingSpyHandler {
     }
 
     public TargetDetailGroup statusOf(Feature feature) {
-        final long currentTimeMillis = currentTimeMillis();
-        requests.put(feature, currentTimeMillis);
-        
-        final StatusResult result = statuses.get(feature);
-        if (null != result) {
-            return result.status();
+        try {
+            final long currentTimeMillis = currentTimeMillis();
+            requests.put(feature, currentTimeMillis);
+            
+            final StatusResult result = statuses.get(feature);
+            if (null != result) {
+                return result.status();
+            }
+            
+            final TargetDetailGroup digest = new TargetDetailGroup(trustedSpy.targetsConstituting(feature));
+            statuses.putIfAbsent(feature, new StatusResult(digest));
+            
+            return digest;
+            
+        }catch(Exception e) {
+            e.printStackTrace(System.out);
         }
-        
-        final TargetDetailGroup digest = new TargetDetailGroup(trustedSpy.targetsConstituting(feature));
-        statuses.putIfAbsent(feature, new StatusResult(digest));
-        
-        return digest;
+        return null;
+      
     }
 
     public long millisecondsUntilNextUpdate(Feature feature) {
@@ -164,6 +171,7 @@ public final class PollingSpyHandler {
             }
             catch (Exception e) {
                 LOG.fatal("Status update failed.", e);
+                e.printStackTrace(System.out);
             }
         }
     }
